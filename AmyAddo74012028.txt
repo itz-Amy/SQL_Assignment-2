@@ -1,0 +1,246 @@
+MariaDB [(none)]> create database projects;
+Query OK, 1 row affected (0.041 sec)
+
+
+MariaDB [(none)]> use projects;
+Database changed
+
+Q 7.24 
+
+MariaDB [projects]> create table employee (empNo varchar(10) PRIMARY KEY, fName varchar(30),lName varchar(30), address varchar(30), DOB date, sex CHAR(1) CHECK (sex IN ('M', 'F')),  position varchar(20) check(position in ("Manager", "Team Leader", "Analyst", "Software Developer")), deptNo varchar(10));
+
+
+MariaDB [projects]> create table department(deptNo varchar(10) Primary Key, deptName varchar(20) not null, mgrEmpNo  varchar(10), Foreign Key(mgrEmpNo) references Employee(empNo));
+Query OK, 0 rows affected (0.017 sec)
+
+
+MariaDB [projects]> alter table employee add constraint fk_deptNo Foreign Key(deptNo) references Department(deptNo);
+Query OK, 0 rows affected (0.068 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [projects]> create table project(projNo varchar(10) Primary Key, projName projects(30) not null, deptNo varchar(10), Foreign Key(deptNo) references Department(deptNo));
+Query OK, 0 rows affected (0.015 sec)
+
+
+MariaDB [projects]> create table worksOn (empNo varchar(10), projNo varchar(10), dateWorked date, hoursWorked int check(hoursWorked between 1 and 100), Primary Key(empNo, ProjNo, dateWorked), Foreign Key(empNo) references employee(empNo), Foreign Key(projNo) references project(projNo));
+Query OK, 0 rows affected (0.013 sec)
+
+
+
+MariaDB [projects]>  show tables;
++--------------------+
+| Tables_in_projects |
++--------------------+
+| department         |
+| employee           |
+| project            |
+| workson            |
++--------------------+
+4 rows in set (0.032 sec)
+
+
+
+MariaDB [projects]> INSERT INTO department (deptNo, deptName, mgrEmpNo) VALUES ('D1', 'IT', NULL),('D2', 'HR', NULL),('D3', 'Finance', NULL),('D4', 'Marketing', NULL), ('D5', 'Operations', NULL);
+Query OK, 5 rows affected (0.113 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+
+MariaDB [projects]> INSERT INTO employee (empNo, fName, lName, address, DOB, sex, position, deptNo) VALUES ('E1', 'Ama', 'Mensah', 'Accra', '2000-05-10', 'F', 'Software Developer', 'D1'), ('E2', 'Kofi', 'Boateng', 'Tema', '1998-03-22', 'M', 'Analyst', 'D2'), ('E3', 'Akosua', 'Owusu', 'Kumasi', '1997-11-15', 'F', 'Team Leader', 'D1'), ('E4', 'Yaw', 'Asante', 'Cape Coast', '1995-07-08', 'M', 'Manager', 'D3'), ('E5', 'Esi', 'Dapaah', 'Takoradi', '1999-02-28', 'F', 'Software Developer', 'D5');
+Query OK, 5 rows affected (0.016 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+MariaDB [projects]> UPDATE department SET mgrEmpNo = "E3" WHERE deptNo = 'D1';
+Query OK, 1 row affected (0.036 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+MariaDB [projects]> UPDATE department SET mgrEmpNo = "E2"  WHERE deptNo = 'D2';
+Query OK, 1 row affected (0.027 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+MariaDB [projects]> UPDATE department SET mgrEmpNo = "E4"  WHERE deptNo = 'D3';
+Query OK, 1 row affected (0.027 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+MariaDB [projects]> UPDATE department SET mgrEmpNo = "E5"  WHERE deptNo = 'D4';
+Query OK, 1 row affected (0.067 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+MariaDB [projects]> UPDATE department SET mgrEmpNo = "E1"  WHERE deptNo = 'D5';
+Query OK, 1 row affected (0.026 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+
+MariaDB [projects]> INSERT INTO project (projNo, projName, deptNo) VALUES('SMCS', 'Payroll System', 'D3'), ('SRCS', 'Recruitment Portal', 'D2'), ('SCCS', 'Inventory System', 'D1'), ('SICS', 'Marketing Analytics', 'D4'), ('SDCS', 'Logistics Tracker', 'D5');
+Query OK, 5 rows affected (0.031 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+
+MariaDB [projects]> INSERT INTO worksOn (empNo, projNo, dateWorked, hoursWorked) VALUES ('E1', 'SCCS', '2026-01-10', 10), ('E2', 'SCCS', '2026-01-11', 20), ('E3', 'SRCS', '2026-01-12', 80), ('E4', 'SRCS', '2026-01-13', 50), ('E5', 'SICS', '2026-01-14', 55);
+Query OK, 5 rows affected (0.007 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+
+MariaDB [projects]> select * from employee;
++-------+--------+---------+------------+------------+------+--------------------+--------+
+| empNo | fName  | lName   | address    | DOB        | sex  | position           | deptNo |
++-------+--------+---------+------------+------------+------+--------------------+--------+
+| E1    | Ama    | Mensah  | Accra      | 2000-05-10 | F    | Software Developer | D1     |
+| E2    | Kofi   | Boateng | Tema       | 1998-03-22 | M    | Analyst            | D2     |
+| E3    | Akosua | Owusu   | Kumasi     | 1997-11-15 | F    | Team Leader        | D1     |
+| E4    | Yaw    | Asante  | Cape Coast | 1995-07-08 | M    | Manager            | D3     |
+| E5    | Esi    | Dapaah  | Takoradi   | 1999-02-28 | F    | Software Developer | D5     |
++-------+--------+---------+------------+------------+------+--------------------+--------+
+5 rows in set (0.001 sec)
+
+
+MariaDB [projects]> select * from department;
++--------+------------+----------+
+| deptNo | deptName   | mgrEmpNo |
++--------+------------+----------+
+| D1     | IT         | E3       |
+| D2     | HR         | E2       |
+| D3     | Finance    | E4       |
+| D4     | Marketing  | E5       |
+| D5     | Operations | E1       |
++--------+------------+----------+
+5 rows in set (0.001 sec)
+
+
+MariaDB [projects]> select * from project;
++--------+---------------------+--------+
+| projNo | projName            | deptNo |
++--------+---------------------+--------+
+| SCCS   | Inventory System    | D1     |
+| SDCS   | Logistics Tracker   | D5     |
+| SICS   | Marketing Analytics | D4     |
+| SMCS   | Payroll System      | D3     |
+| SRCS   | Recruitment Portal  | D2     |
++--------+---------------------+--------+
+5 rows in set (0.001 sec)
+
+
+MariaDB [projects]>  select * from worksOn;
++-------+--------+------------+-------------+
+| empNo | projNo | dateWorked | hoursWorked |
++-------+--------+------------+-------------+
+| E1    | SCCS   | 2026-01-10 |          10 |
+| E2    | SCCS   | 2026-01-11 |          20 |
+| E3    | SRCS   | 2026-01-12 |          80 |
+| E4    | SRCS   | 2026-01-13 |          50 |
+| E5    | SICS   | 2026-01-14 |          55 |
++-------+--------+------------+-------------+
+5 rows in set (0.001 sec)
+
+
+Q 7.25
+
+MariaDB [projects]> create view FemaleProjects as select p.projNo, p.projName, e.fName, d.mgrEmpNo from Project as p join department as d on p.deptNo = d.deptNo join employee as e on d.mgrEmpNo = e.empNo where e.sex = 'F' order by p.projNo;
+Query OK, 0 rows affected (0.051 sec)
+
+
+MariaDB [projects]> select * from FemaleProjects;
++--------+---------------------+--------+----------+
+| projNo | projName            | fName  | mgrEmpNo |
++--------+---------------------+--------+----------+
+| SCCS   | Inventory System    | Akosua | E3       |
+| SDCS   | Logistics Tracker   | Ama    | E1       |
+| SICS   | Marketing Analytics | Esi    | E5       |
++--------+---------------------+--------+----------+
+3 rows in set (0.036 sec)
+
+Q7.26
+
+MariaDB [projects]> Create view EmployeeProject as select e.empNo, e.fName, e.lName, p.projName, w.hoursWorked from employee as e join worksOn w on e.empNo = w.empNo join project p on p.projNo = w.projNo;
+Query OK, 0 rows affected (0.010 sec)
+
+
+MariaDB [projects]> select * from EmployeeProject;
++-------+--------+---------+---------------------+-------------+
+| empNo | fName  | lName   | projName            | hoursWorked |
++-------+--------+---------+---------------------+-------------+
+| E1    | Ama    | Mensah  | Inventory System    |          10 |
+| E2    | Kofi   | Boateng | Inventory System    |          20 |
+| E3    | Akosua | Owusu   | Recruitment Portal  |          80 |
+| E4    | Yaw    | Asante  | Recruitment Portal  |          50 |
+| E5    | Esi    | Dapaah  | Marketing Analytics |          55 |
++-------+--------+---------+---------------------+-------------+
+5 rows in set (0.006 sec)
+
+Q 7.27
+A)
+MariaDB [projects]> create view EmpProject(empNo, projNo, totalHours) as select w.empNo, w.projNo, Sum(w.hoursWorked) from employee as e, worksOn w, project p where e.empNo = w.empNo and p.projNo = w.projNo group by w.empNo, w.projNo;
+Query OK, 0 rows affected (0.007 sec)
+
+
+MariaDB [projects]> select * from EmpProject;
++-------+--------+------------+
+| empNo | projNo | totalHours |
++-------+--------+------------+
+| E1    | SCCS   |         10 |
+| E2    | SCCS   |         20 |
+| E3    | SRCS   |         80 |
+| E4    | SRCS   |         50 |
+| E5    | SICS   |         55 |
++-------+--------+------------+
+5 rows in set (0.009 sec)
+
+
+B)
+MariaDB [projects]> select * from EmpProject where projNo = 'SCCS';
++-------+--------+------------+
+| empNo | projNo | totalHours |
++-------+--------+------------+
+| E1    | SCCS   |         10 |
+| E2    | SCCS   |         20 |
++-------+--------+------------+
+2 rows in set (0.029 sec)
+
+C)
+MariaDB [projects]> select count(projNo) from EmpProject where empNo = 'E1';
++---------------+
+| count(projNo) |
++---------------+
+|             1 |
++---------------+
+1 row in set (0.003 sec)
+
+
+D)
+
+MariaDB [projects]> select empNo, totalHours from EmpProject group by empNo;
++-------+------------+
+| empNo | totalHours |
++-------+------------+
+| E1    |         10 |
+| E2    |         20 |
+| E3    |         80 |
+| E4    |         50 |
+| E5    |         55 |
++-------+------------+
+5 rows in set (0.002 sec)
+
+
+
+7.28
+To maintain this as a materialised view the view would need to be regularly updated to match any of the data that was recently added to the base tables. 
+
+Circumstances in insertion and deletion where the materialised view would be maintained without accessing the base table.
+
+Insertion
+a)The view would be maintained without accessing Part table if the record entered into the Part table has partCost > 1000 and then the partNo is added to the view. 
+b) However, if partNo already exists in the view, then when a new record is added to the Part Table, no new row would be added to the materialised view. 
+c) Lastly, if a record newly inserted to the Part table with partNo < 1000 it would not be added to ExpensiveParts.
+
+Deletion
+a) The view would be maintained without accessing Part table if the record deleted from the Part table is unique and only one of the partNo is in the table.
+b) If the partNo deleted from the Part table has more than one PartNo in it(base table), when one is deleted, the row in the materialised view does not get deleted.
+
+
+
+
+
+
+
+
+
+
